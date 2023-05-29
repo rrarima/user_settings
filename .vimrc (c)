@@ -1,0 +1,36 @@
+set number
+set colorcolumn=80
+set noexpandtab
+set shiftwidth=8
+set fileformat=unix
+filetype indent on
+set autoindent
+set statusline+=%F
+set laststatus=2
+
+" auto close with matching bracket
+inoremap { {}<c-g>U<left>
+" if between 2 brackets: "enter" to start inserting between them
+inoremap <expr> <cr> getline('.')[col('.')-2:col('.')-1]=='{}' ? '<cr><esc>O' : '<cr>'
+" If on a closing bracket: trying to reclose just skips the character
+inoremap <expr> } getline('.')[col('.')-1]=='}' ? '<c-g>U<right>' : '}'
+
+inoremap ( ()<c-g>U<left>
+inoremap <expr> ) getline('.')[col('.')-1]==')' ? '<c-g>U<right>' : ')'
+
+inoremap [ []<c-g>U<left>
+inoremap <expr> ] getline('.')[col('.')-1]==']' ? '<c-g>U<right>' : ']'
+
+inoremap <expr> <Tab> search('\%#[])}''"]', 'n') ? '<Right>' : '<Tab>'
+inoremap " ""<Esc>ha
+inoremap ' ''<Esc>ha
+inoremap ` ``<Esc>ha
+
+nnoremap <CR> :nohlsearch<CR><CR>
+
+noremap <Tab> <C-w>w
+noremap <bs> <C-w>W
+
+syntax on
+highlight ExtraWhitespace ctermbg=red guibg=red
+match ExtraWhitespace /\s\+$/

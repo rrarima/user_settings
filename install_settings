@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# Function to ask for confirmation
+function ask_confirm() {
+    while true; do
+        read -p "$1 (y/n): " yn
+        case $yn in
+            [Yy]* ) return 0;;
+            [Nn]* ) return 1;;
+            * ) echo "Please answer yes or no.";;
+        esac
+    done
+}
+
+# Check if git is installed
+if ! command -v git &> /dev/null
+then
+    if ask_confirm "git is not installed. Would you like to install it?"; then
+        sudo apt-get update
+        sudo apt-get install git
+    else
+        echo "git is required for this script to run. Exiting."
+        exit 1
+    fi
+fi
+
+# Clone the repo into a temporary directory
+cd ~
+git clone https://github.com/rrarima/user_settings.git temp_settings
+
+# Overwrite the files
+for file in .bash_aliases .bash_profile .bashrc; do
+    if [ -f ~/$file ] && ! ask_confirm "$file exists. Overwrite?"; then
+        echo "Skipping $file"
+    else
+        cp temp_settings/$file ~/$file
+    fi
+done
+
+# Ask the user which .vimrc they want
+echo "Which .vimrc would you like to use?"
+echo "1) .vimrc (c)"
+echo "2) .vimrc (python)"
+read -p "Enter choice [ 1 - 2] " choice
+
+case $choice in
+    1)
+        if [ -f ~/.vimrc ] && ! ask_confirm ".vimrc exists. Overwrite?"; then
+            echo "Skipping .vimrc"
+        else
+            cp temp_settings/.vimrc\ \(c\) ~/.vimrc
+        fi
+        ;;
+    2)
+        if [ -f ~/.vimrc ] && ! ask_confirm ".vimrc exists. Overwrite?"; then
+            echo "Skipping .vimrc"
+        else
+            cp temp_settings/.vimrc\ \(python\) ~/.vimrc
+        fi
+        ;;
+    *)
+        echo "Invalid choice. Exiting."
+        exit 1
+        ;;
+esac
+
+# Delete the temp directory
+rm -rf temp_settings
+
+echo -e "\nInstallation complete!"
+echo -e "Please close and re-open your shell.\n"
+
+# Refresh the console
+source ~/.bashrc
